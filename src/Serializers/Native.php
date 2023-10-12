@@ -284,7 +284,13 @@ class Native implements Serializable
                         static::wrapClosures($value, $storage);
                     }
 
-                    $property->setValue($data, $value);
+                    try {
+                        $property->setValue($data, $value);
+                    } catch (\Throwable $t) {
+                        if ($t instanceof \TypeError) {
+                            $property->setValue($data, $value->getClosure());
+                        }
+                    }
                 }
             } while ($reflection = $reflection->getParentClass());
         }
